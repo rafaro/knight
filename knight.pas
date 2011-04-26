@@ -1,196 +1,319 @@
 unit Knight;
 
 interface
+
+uses graphics;
+
 type
 
+  { TBool }
+
+  TBool = class(TObject)
+  private
+    function GetTrueString: string;
+    function GetFalseString: string;
+  public
+    Property TrueString: string read GetTrueString;
+    Property FalseString: string read GetFalseString;
+  end;
+  
+  TInt = class(TObject)	
+  private
+	FMinValue: integer;
+	FMaxValue: integer;
+  public
+  
+  end;
+  
   TUserDialog = class(TObject)
   private
 
   public
-    procedure WarningOK(text:string);
-    procedure ErrorOK(text:string);
-    function ConfirmationYesNo(text:string):Boolean;
+    procedure WarningOK(text: string);
+    procedure ErrorOK(text: string);
+    function ConfirmationYesNo(text: string): Boolean;
   end;
   
   TDraw = class(TObject)
   private
-    function Line(x,y:integer):TCanvas;  
-    function Rectangle(topline, bottomline, leftline, rightline):TCanvas;
+  function Line(x,y: integer):TCanvas;
+    function Rectangle(topline, bottomline, leftline, rightline: integer):TCanvas;
   public
     
   end;
+
+  { TValidate }
 
   TValidate = class(TObject)
   private
 
   public
     //It validate the brazilian ID
-    function CPF(CPF:string):boolean;
-    function CNPJ(CNPJ:string):boolean;
+    function CPF(Value: string): Boolean;
+    function CNPJ(Value: string): Boolean;
   end;
+  
+  { TPut }
+
   TPut = class(TObject)
   private
     //It put a char for n times at left string
-    function FillLeft(text:string; times:integer; chr:char):string; overload;
-    function FillLeft(text:string; times:integer):string; overload;
+    function FillLeft(text: string; times: integer; chr: char): string; overload;
+    function FillLeft(text: string; times: integer): string; overload;
     //It put a char for n times at right string
-    function FillRight(text:string; times:integer; chr:char):string; overload;
-    function FillRight(text:string; times:integer):string; overload;
+    function FillRight(text: string; times: integer; chr: char): string; overload;
+    function FillRight(text: string; times: integer): string; overload;
   public
     
   end;
+
+  { TConvert }
+
   TConvert = class(TObject)
   private
-    
+	
   public
     //to convert to string type
-    function ToString(double : Double):string; overload;
-    function ToString(bool : Boolean):string; overload;
-    function ToString(date : TDateTime):string; overload;
+    function Tostring(double: Double): string; overload;
+    function Tostring(Value: Boolean): string; overload;
+    function Tostring(date: TDateTime): string; overload;
     //to convert to boolean type
-    function ToBoolean(str : string) : boolean; overload;
-    function ToBoolean(int : integer) : boolean; overload;
+    function ToBoolean(Value: String): boolean; overload;
+    function ToBoolean(Value: integer): boolean; overload;
+    function ToBoolean(Value: double): boolean; overload;
     //to convert to Byte type
-    function ToByte(str:string):Byte; Overload;
-    function ToByte(bool:Boolean):Byte; Overload;
+    function ToByte(Value: string):Byte; Overload;
+    function ToByte(Value: Boolean):Byte; Overload;
     //to convert to Word type
-    function ToWord(str:string):Byte; Overload;
-    function ToWord(bool:Boolean):Byte; Overload;
+    function ToWord(Value: string):Byte; Overload;
+    function ToWord(Value: Boolean):Byte; Overload;
     //to convert to Char type
-    function ToChar(str:string):Char; Overload;
-    function ToChar(bool:Boolean):Char; Overload;
+    function ToChar(Value: string):Char; Overload;
+    function ToChar(Value: Boolean):Char; Overload;
     //to convert to Date type
-    function ToDateTime(str:string):TDateTime ; Overload;
-    function ToDateTime(bool:Boolean):TDateTime ; Overload;
+    function ToDateTime(Value: string):TDateTime ; Overload;
+    function ToDateTime(Value: Boolean):TDateTime ; Overload;
     //to convert to Decimal type
-    function ToDecimal(str:string):Currency; Overload;
-    function ToDecimal(bool:Boolean):Currency; Overload;
+    function ToDecimal(Value: string):Currency; Overload;
+    function ToDecimal(Value: Boolean):Currency; Overload;
     //to convert to integer of 16 bits type
-    function ToInt16(str:string):Smallint; Overload;
-    function ToInt16(bool:Boolean):Smallint; Overload;
+    function ToInt16(Value: string):Smallint; Overload;
+    function ToInt16(Value: Boolean):Smallint; Overload;
     //to convert to integer of 32 bits type
-    function ToInt32(str:string):Longint; Overload;
-    function ToInt32(bool:Boolean):Longint; Overload;
+    function ToInt32(Value: string):Longint; Overload;
+    function ToInt32(Value: Boolean):Longint; Overload;
     //to convert to integer of 64 bits type
-    function ToInt64(str:string):Int64; Overload;
-    function ToInt64(bool:Boolean):Int64; Overload;  
+    function ToInt64(Value: string):Int64; Overload;
+    function ToInt64(Value: Boolean):Int64; Overload;  
   end;
   
   TKnight = class(TObject)
   private
-    Convert : TConvert;
-    Put : TPut; 
-    Validate : TValidate;
-    Draw : TDraw; 
+    Convert: TConvert;
+    Put: TPut; 
+    Validate: TValidate;
+    Draw: TDraw; 
   public
     constructor Create;
   end;
-  
+
+var Knt: TKnight;
+  Bool: TBool;
+
 implementation
+
+uses SysUtils;
+
+{ TPut }
+
+function TPut.FillLeft(text: string; times: integer; chr: char): string;
+begin
+
+end;
+
+function TPut.FillLeft(text: string; times: integer): string;
+begin
+
+end;
+
+function TPut.FillRight(text: string; times: integer; chr: char): string;
+begin
+
+end;
+
+function TPut.FillRight(text: string; times: integer): string;
+begin
+
+end;
+
+{ TValidate }
+
+function TValidate.CPF(Value: string): Boolean;
+begin
+
+end;
+
+function TValidate.CNPJ(Value: string): Boolean;
+begin
+
+end;
+
+{ TBool }
+
+function TBool.GetTrueString: string;
+const
+  TRUESTR = 'True';
+begin
+  Result := TRUESTR;
+end;
+
+function TBool.GetFalseString: string;
+const
+  FALSESTR = 'False';
+begin
+  Result := FALSESTR;
+end;
 
 { TConvert }
 
-function TConvert.ToString(double: Double): string;
+function TConvert.Tostring(double: Double): string;
 begin
 
 end;
 
-function TConvert.ToString(bool: Boolean): string;
+function TConvert.Tostring(Value: Boolean): string;
 begin
 
 end;
 
-function TConvert.ToBoolean(int: integer): boolean;
+function TConvert.ToBoolean(Value: integer): boolean;
 begin
 
 end;
 
-function TConvert.ToBoolean(str: string): boolean;
+function TConvert.ToBoolean(Value: double): boolean;
 begin
 
 end;
 
-function TConvert.ToByte(str: string): Byte;
+{
+Parameters
+value
+Type: double
+The number to convert. 
+Return Value
+
+Type: boolean
+true if value is not zero; otherwise, false.
+}
+function ToBoolean(Value: double): boolean;
 begin
 
 end;
 
-function TConvert.ToByte(bool: Boolean): Byte;
+{value
+Type: string
+A string that contains the value of either TrueString or FalseString. 
+Return Value
+
+Type: Boolean
+true if value equals Truestring, or false if value equals Falsestring or null.}
+function TConvert.ToBoolean(Value: string): boolean;
+begin
+  Value := Trim(Value);
+  //TODO: To create a exception for easilier utilization
+  if (Value <> Bool.TrueString) and (Value <> Bool.FalseString) then
+	raise Exception.CreateFmt('Value was not recognized as a valid variable',[]);
+
+  if Value = Bool.TrueString then
+	Result := True;
+  
+  if Value = Bool.FalseString then
+	Result := False;
+
+end;
+
+function TConvert.ToByte(Value: string): Byte;
 begin
 
 end;
 
-function TConvert.ToChar(str: string): Char;
+function TConvert.ToByte(Value: Boolean): Byte;
 begin
 
 end;
 
-function TConvert.ToChar(bool: Boolean): Char;
+function TConvert.ToChar(Value: string): Char;
 begin
 
 end;
 
-function TConvert.ToDateTime(str: string): TDateTime;
+function TConvert.ToChar(Value: Boolean): Char;
 begin
 
 end;
 
-function TConvert.ToDateTime(bool: Boolean): TDateTime;
+function TConvert.ToDateTime(Value: string): TDateTime;
 begin
 
 end;
 
-function TConvert.ToDecimal(bool: Boolean): Currency;
+function TConvert.ToDateTime(Value: Boolean): TDateTime;
 begin
 
 end;
 
-function TConvert.ToDecimal(str: string): Currency;
+function TConvert.ToDecimal(Value: Boolean): Currency;
 begin
 
 end;
 
-function TConvert.ToInt16(str: string): Smallint;
+function TConvert.ToDecimal(Value: string): Currency;
 begin
 
 end;
 
-function TConvert.ToInt16(bool: Boolean): Smallint;
+function TConvert.ToInt16(Value: string): Smallint;
 begin
 
 end;
 
-function TConvert.ToInt32(bool: Boolean): Longint;
+function TConvert.ToInt16(Value: Boolean): Smallint;
 begin
 
 end;
 
-function TConvert.ToInt32(str: string): Longint;
+function TConvert.ToInt32(Value: Boolean): Longint;
 begin
 
 end;
 
-function TConvert.ToInt64(str: string): Int64;
+function TConvert.ToInt32(Value: string): Longint;
 begin
 
 end;
 
-function TConvert.ToInt64(bool: Boolean): Int64;
+function TConvert.ToInt64(Value: string): Int64;
 begin
 
 end;
 
-function TConvert.ToString(date: TDateTime): string;
+function TConvert.ToInt64(Value: Boolean): Int64;
 begin
 
 end;
 
-function TConvert.ToWord(bool: Boolean): Byte;
+function TConvert.Tostring(date: TDateTime): string;
 begin
 
 end;
 
-function TConvert.ToWord(str: string): Byte;
+function TConvert.ToWord(Value: Boolean): Byte;
+begin
+
+end;
+
+function TConvert.ToWord(Value: string): Byte;
 begin
 
 end;
@@ -212,7 +335,7 @@ begin
 
 end;
 
-function TDraw.Rectangle(topline, bottomline, leftline, rightline): TCanvas;
+function TDraw.Rectangle(topline, bottomline, leftline, rightline: integer): TCanvas;
 begin
 
 end;
