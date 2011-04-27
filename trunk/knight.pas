@@ -107,14 +107,19 @@ type
     function ToInt64(Value: Boolean):Int64; Overload;  
   end;
   
+  { TKnight }
+
   TKnight = class(TObject)
   private
+    class var FInstance: TObject;
     Convert: TConvert;
     Put: TPut; 
     Validate: TValidate;
-    Draw: TDraw; 
+    Draw: TDraw;
   public
     constructor Create;
+    class function NewInstance: TObject; override;
+    procedure FreeInstance; override;
   end;
 
 var Knt: TKnight;
@@ -322,10 +327,35 @@ end;
 
 constructor TKnight.Create;
 begin
-  self.Convert := TConvert.Create;
-  self.Put := TPut.Create;
-  self.Validate := TValidate.Create;
-  self.Draw := TDraw.Create;
+end;
+
+class function TKnight.NewInstance: TObject;
+begin
+  if (not Assigned(Self.FInstance)) then
+  begin
+    Instance := inherited NewInstance;
+    // Initialize private variables here, like this:
+    //   TSingleton(Result).Variable := Value;
+    self.Convert := TConvert.Create;
+    self.Put := TPut.Create;
+    self.Validate := TValidate.Create;
+    self.Draw := TDraw.Create;
+  end;
+  Result := Instance
+end;
+
+procedure TKnight.FreeInstance;
+begin
+  if Assigned(Instance) then
+  begin
+    FreeAndNil(Instance);
+    // Destroy private variables here
+    self.Convert.Free;
+    self.Put.Free;
+    self.Validate.Free;
+    self.Draw.Free;
+    inherited FreeInstance;
+  end;
 end;
 
 { TDraw }
