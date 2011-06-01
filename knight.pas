@@ -113,10 +113,11 @@ type
   private
     class var FInstance: TObject;
     Convert: TConvert;
-    Put: TPut; 
+    Put: TPut;
     Validate: TValidate;
     Draw: TDraw;
   public
+    Data: String;
     constructor Create;
     class function NewInstance: TObject; override;
     procedure FreeInstance; override;
@@ -333,22 +334,20 @@ class function TKnight.NewInstance: TObject;
 begin
   if (not Assigned(Self.FInstance)) then
   begin
-    Instance := inherited NewInstance;
-    // Initialize private variables here, like this:
-    //   TSingleton(Result).Variable := Value;
-    self.Convert := TConvert.Create;
-    self.Put := TPut.Create;
-    self.Validate := TValidate.Create;
-    self.Draw := TDraw.Create;
+    Self.FInstance := inherited NewInstance;
+    TKnight(Result).Convert := TConvert.Create;
+    TKnight(Result).Put := TPut.Create;
+    TKnight(Result).Validate := TValidate.Create;
+    TKnight(Result).Draw := TDraw.Create;
   end;
-  Result := Instance
+  Result := Self.FInstance
 end;
 
 procedure TKnight.FreeInstance;
 begin
-  if Assigned(Instance) then
+  if Assigned(Self.FInstance) then
   begin
-    FreeAndNil(Instance);
+    FreeAndNil(Self.FInstance);
     // Destroy private variables here
     self.Convert.Free;
     self.Put.Free;
