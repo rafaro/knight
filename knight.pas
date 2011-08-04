@@ -111,11 +111,12 @@ type
 
   TKnight = class(TObject)
   private
-    class var FInstance: TObject;
     Convert: TConvert;
     Put: TPut;
     Validate: TValidate;
     Draw: TDraw;
+    class var
+     FInstance: TObject;
   public
     Data: String;
     constructor Create;
