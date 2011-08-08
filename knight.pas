@@ -17,10 +17,10 @@ type
     Property FalseString: string read GetFalseString;
   end;
   
-  TInt = class(TObject)	
+  TInt = class(TObject)
   private
-	FMinValue: integer;
-	FMaxValue: integer;
+    FMinValue: integer;
+    FMaxValue: integer;
   public
   
   end;
@@ -29,9 +29,14 @@ type
   private
 
   public
-    procedure WarningOK(text: string);
-    procedure ErrorOK(text: string);
-    function ConfirmationYesNo(text: string): Boolean;
+    procedure WarningOK(const Text: string); overload;
+    procedure WarningOK(const Text, Title: string); overload;
+    procedure ErrorOK(const Text: string); overload;
+    procedure ErrorOK(const Text, Title: string); overload;
+    function ConfirmationYesNo(const Text: string): Boolean; overload;
+    function ConfirmationYesNo(const Text, Title: string): Boolean; overload;
+    function ConfirmationYesNo(const Text, Title: string; const IsValid: Boolean):
+        Boolean; overload;
   end;
   
   TDraw = class(TObject)
@@ -52,7 +57,7 @@ type
     function CPF(Value: string): Boolean;
     function CNPJ(Value: string): Boolean;
   end;
-  
+
   { TPut }
 
   TPut = class(TObject)
@@ -71,7 +76,7 @@ type
 
   TConvert = class(TObject)
   private
-	
+
   public
     //to convert to string type
     function Tostring(double: Double): string; overload;
@@ -106,15 +111,26 @@ type
     function ToInt64(Value: string):Int64; Overload;
     function ToInt64(Value: Boolean):Int64; Overload;  
   end;
-  
+
+
+  TConst = class(TObject)
+  private
+    FCRLF: String;
+  public
+    constructor Create;
+    property CRLF: String read FCRLF;
+  end;
+
   { TKnight }
 
   TKnight = class(TObject)
   private
-    Convert: TConvert;
-    Put: TPut;
-    Validate: TValidate;
-    Draw: TDraw;
+    FCnst: TConst;
+    FConvert: TConvert;
+    FDraw: TDraw;
+    FPut: TPut;
+    FUserDlg: TUserDialog;
+    FValidate: TValidate;
     class var
      FInstance: TObject;
   public
@@ -122,14 +138,21 @@ type
     constructor Create;
     class function NewInstance: TObject; override;
     procedure FreeInstance; override;
+    property Cnst: TConst read FCnst;
+    property Convert: TConvert read FConvert;
+    property Draw: TDraw read FDraw;
+    property Put: TPut read FPut;
+    property UserDlg: TUserDialog read FUserDlg;
+    property Validate: TValidate read FValidate;
   end;
+
 
 var Knt: TKnight;
   Bool: TBool;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, Messages, Dialogs, Forms, Windows;
 
 { TPut }
 
@@ -230,13 +253,13 @@ begin
   Value := Trim(Value);
   //TODO: To create a exception for easilier utilization
   if (Value <> Bool.TrueString) and (Value <> Bool.FalseString) then
-	raise Exception.CreateFmt('Value was not recognized as a valid variable',[]);
+    raise Exception.CreateFmt('Value was not recognized as a valid variable',[]);
 
   if Value = Bool.TrueString then
-	Result := True;
-  
+    Result := True;
+
   if Value = Bool.FalseString then
-	Result := False;
+    Result := False;
 
 end;
 
@@ -336,10 +359,12 @@ begin
   if (not Assigned(Self.FInstance)) then
   begin
     Self.FInstance := inherited NewInstance;
-    TKnight(Result).Convert := TConvert.Create;
-    TKnight(Result).Put := TPut.Create;
-    TKnight(Result).Validate := TValidate.Create;
-    TKnight(Result).Draw := TDraw.Create;
+    TKnight(Self.FInstance).FConvert := TConvert.Create;
+    TKnight(Self.FInstance).FPut := TPut.Create;
+    TKnight(Self.FInstance).FValidate := TValidate.Create;
+    TKnight(Self.FInstance).FDraw := TDraw.Create;
+    TKnight(Self.FInstance).FCnst := TConst.Create;
+    TKnight(Self.FInstance).FUserDlg := TUserDialog.Create;
   end;
   Result := Self.FInstance
 end;
@@ -372,19 +397,59 @@ end;
 
 { TUserDialog }
 
-function TUserDialog.ConfirmationYesNo(text: string): Boolean;
+function TUserDialog.ConfirmationYesNo(const Text, Title: string): Boolean;
 begin
-
+  result := (Application.MessageBox(pchar(Text), pchar(Title),
+    MB_ICONINFORMATION or MB_YESNO or MB_TOPMOST or MB_DEFBUTTON1) = idYes);
 end;
 
-procedure TUserDialog.ErrorOK(text: string);
+function TUserDialog.ConfirmationYesNo(const Text, Title: string; const
+    IsValid: Boolean): Boolean;
 begin
-
+  Result := IsValid;
+  if IsValid then
+  begin
+    result := (Application.MessageBox(pchar(Text), pchar(Title),
+      MB_ICONINFORMATION or MB_YESNO or MB_TOPMOST or MB_DEFBUTTON1) = idYes);
+  end;
 end;
 
-procedure TUserDialog.WarningOK(text: string);
+procedure TUserDialog.ErrorOK(const Text: string);
 begin
-
+  Application.MessageBox(pchar(Text), pchar(Application.Title), MB_ICONSTOP or
+    MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
 end;
+
+function TUserDialog.ConfirmationYesNo(const Text: string): Boolean;
+begin
+  result := (Application.MessageBox(pchar(Text), pchar(Application.Title),
+    MB_ICONINFORMATION or MB_YESNO or MB_TOPMOST or MB_DEFBUTTON1) = idYes);
+end;
+
+procedure TUserDialog.ErrorOK(const Text, Title: string);
+begin
+  Application.MessageBox(pchar(Text), pchar(Title), MB_ICONSTOP or MB_OK or
+    MB_TOPMOST or MB_DEFBUTTON1);
+end;
+
+procedure TUserDialog.WarningOK(const Text: string);
+begin
+  Application.MessageBox(pchar(Text), pchar(Application.Title), MB_ICONSTOP or
+    MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
+end;
+
+procedure TUserDialog.WarningOK(const Text, Title: string);
+begin
+    Application.MessageBox(pchar(Text) , pchar(Title), MB_ICONWARNING or
+      MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
+end;
+
+constructor TConst.Create;
+begin
+  Self.FCRLF := #13#10;
+end;
+
+initialization
+  knt := TKnight.Create;
 
 end.
