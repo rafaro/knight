@@ -24,6 +24,26 @@ type
   public
   
   end;
+
+  TStr = class
+  private
+  public
+    function AppDirectory: string;
+    function CaseStr(const AText: string; const AValues: array of string): Integer;
+    function padL(const AString: AnsiString; const Len: Integer;
+      const Caracter: AnsiChar = ' '): AnsiString;
+    function Trans(Str, Char, CharS: string): string;
+    function RepeatChar(Len: Integer; Char: char = ' '): string;
+    function RemovePoint(Str: string): string;
+    function Replace(const Str, OldPattern, NewPattern: string): string;
+    function Right(const Str: string; const Count: Integer): string;
+
+    function LeftFit(Text: string; Count: Smallint; Ch: Char = '0'): string; overload;
+    function LeftFit(Value: Currency; Count: Smallint; Ch: Char = '0'; Masc: string = '0.0000'): string;overload;
+
+    function RightFit(Text: string; Count: Smallint; Ch: Char = ' ') : string;overload;
+    function RightFit(Value: Currency; Count: Smallint; Ch: Char = ' '; Masc: string = '0.0000') : string;overload;
+  end;
   
   TUserDialog = class(TObject)
   private
@@ -41,7 +61,7 @@ type
   
   TDraw = class(TObject)
   private
-  function Line(x,y: integer):TCanvas;
+    function Line(x,y: integer):TCanvas;
     function Rectangle(topline, bottomline, leftline, rightline: integer):TCanvas;
   public
     
@@ -53,7 +73,7 @@ type
   private
 
   public
-    //It validate the brazilian ID
+    //It validates the brazilian ID
     function CPF(Value: string): Boolean;
     function CNPJ(Value: string): Boolean;
   end;
@@ -62,10 +82,10 @@ type
 
   TPut = class(TObject)
   private
-    //It put a char for n times at left string
+    //It puts a char for n times at left string
     function FillLeft(text: string; times: integer; chr: char): string; overload;
     function FillLeft(text: string; times: integer): string; overload;
-    //It put a char for n times at right string
+    //It puts a char for n times at right string
     function FillRight(text: string; times: integer; chr: char): string; overload;
     function FillRight(text: string; times: integer): string; overload;
   public
@@ -79,9 +99,9 @@ type
 
   public
     //to convert to string type
-    function Tostring(double: Double): string; overload;
-    function Tostring(Value: Boolean): string; overload;
-    function Tostring(date: TDateTime): string; overload;
+    function ToString(double: Double): string; overload;
+    function ToString(Value: Boolean): string; overload;
+    function ToString(date: TDateTime): string; overload;
     //to convert to boolean type
     function ToBoolean(Value: String): boolean; overload;
     function ToBoolean(Value: integer): boolean; overload;
@@ -101,6 +121,7 @@ type
     //to convert to Decimal type
     function ToDecimal(Value: string):Currency; Overload;
     function ToDecimal(Value: Boolean):Currency; Overload;
+    function ToHour(const Value: TDateTime): string;
     //to convert to integer of 16 bits type
     function ToInt16(Value: string):Smallint; Overload;
     function ToInt16(Value: Boolean):Smallint; Overload;
@@ -113,7 +134,7 @@ type
   end;
 
 
-  TConst = class(TObject)
+  TConstant = class(TObject)
   private
     FCRLF: String;
   public
@@ -121,14 +142,23 @@ type
     property CRLF: String read FCRLF;
   end;
 
+  TDate = class(TObject)
+  public
+    function EndOfAMonth(const AYear, AMonth: Word): TDateTime;
+    function EncodeDate(Year, Month, Day: Word): TDateTime;
+    procedure DecodeDate(var Year, Month, Day: Word);
+  end;
+
   { TKnight }
 
   TKnight = class(TObject)
   private
-    FCnst: TConst;
     FConvert: TConvert;
+    FDate: TDate;
     FDraw: TDraw;
     FPut: TPut;
+    FStr: TStr;
+    FCons: TConstant;
     FUserDlg: TUserDialog;
     FValidate: TValidate;
     class var
@@ -138,21 +168,22 @@ type
     constructor Create;
     class function NewInstance: TObject; override;
     procedure FreeInstance; override;
-    property Cnst: TConst read FCnst;
     property Convert: TConvert read FConvert;
+    property Date: TDate read FDate;
     property Draw: TDraw read FDraw;
     property Put: TPut read FPut;
+    property Str: TStr read FStr;
+    property Cons: TConstant read FCons;
     property UserDlg: TUserDialog read FUserDlg;
     property Validate: TValidate read FValidate;
   end;
-
 
 var Knt: TKnight;
   Bool: TBool;
 
 implementation
 
-uses SysUtils, Messages, Dialogs, Forms, Windows;
+uses SysUtils, Messages, Dialogs, Forms, Windows, DateUtils, StrUtils;
 
 { TPut }
 
@@ -206,12 +237,12 @@ end;
 
 { TConvert }
 
-function TConvert.Tostring(double: Double): string;
+function TConvert.ToString(double: Double): string;
 begin
 
 end;
 
-function TConvert.Tostring(Value: Boolean): string;
+function TConvert.ToString(Value: Boolean): string;
 begin
 
 end;
@@ -303,6 +334,11 @@ begin
 
 end;
 
+function TConvert.ToHour(const Value: TDateTime): string;
+begin
+  Result := FormatDateTime('hh:nn:ss', Value);
+end;
+
 function TConvert.ToInt16(Value: string): Smallint;
 begin
 
@@ -333,7 +369,7 @@ begin
 
 end;
 
-function TConvert.Tostring(date: TDateTime): string;
+function TConvert.ToString(date: TDateTime): string;
 begin
 
 end;
@@ -356,31 +392,34 @@ end;
 
 class function TKnight.NewInstance: TObject;
 begin
-  if (not Assigned(Self.FInstance)) then
+  if not Assigned(FInstance) then
   begin
-    Self.FInstance := inherited NewInstance;
-    TKnight(Self.FInstance).FConvert := TConvert.Create;
-    TKnight(Self.FInstance).FPut := TPut.Create;
-    TKnight(Self.FInstance).FValidate := TValidate.Create;
-    TKnight(Self.FInstance).FDraw := TDraw.Create;
-    TKnight(Self.FInstance).FCnst := TConst.Create;
-    TKnight(Self.FInstance).FUserDlg := TUserDialog.Create;
+    FInstance := inherited NewInstance;
+    TKnight(FInstance).FConvert := TConvert.Create;
+    TKnight(FInstance).FPut := TPut.Create;
+    TKnight(FInstance).FValidate := TValidate.Create;
+    TKnight(FInstance).FDraw := TDraw.Create;
+    TKnight(FInstance).FCons := TConstant.Create;
+    TKnight(FInstance).FUserDlg := TUserDialog.Create;
+    TKnight(FInstance).FStr := TStr.Create;
+    TKnight(FInstance).FDate := TDate.Create;
   end;
-  Result := Self.FInstance
+  Result := FInstance
 end;
 
 procedure TKnight.FreeInstance;
 begin
-  if Assigned(Self.FInstance) then
+  if Assigned(FInstance) then
   begin
-    FreeAndNil(Self.FInstance);
-    // Destroy private variables here
-    self.Convert.Free;
-    self.Put.Free;
-    self.Validate.Free;
-    self.Draw.Free;
-    inherited FreeInstance;
+    FreeAndNil(FInstance);
+    FConvert.Free;
+    FPut.Free;
+    FValidate.Free;
+    FDraw.Free;
+    FStr.Free;
+    FDate.Free;
   end;
+  inherited FreeInstance;
 end;
 
 { TDraw }
@@ -434,19 +473,107 @@ end;
 
 procedure TUserDialog.WarningOK(const Text: string);
 begin
-  Application.MessageBox(pchar(Text), pchar(Application.Title), MB_ICONSTOP or
+  Application.MessageBox(pchar(Text) , pchar(Application.Title), MB_ICONWARNING or
     MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
 end;
 
 procedure TUserDialog.WarningOK(const Text, Title: string);
 begin
-    Application.MessageBox(pchar(Text) , pchar(Title), MB_ICONWARNING or
-      MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
+  Application.MessageBox(pchar(Text) , pchar(Title), MB_ICONWARNING or
+    MB_OK or MB_TOPMOST or MB_DEFBUTTON1);
 end;
 
-constructor TConst.Create;
+constructor TConstant.Create;
 begin
-  Self.FCRLF := #13#10;
+  FCRLF := #13#10;
+end;
+
+function TStr.AppDirectory: string;
+begin
+  Result := ExtractFilePath(Application.ExeName);
+end;
+
+function TStr.CaseStr(const AText: string; const AValues: array of string):
+    Integer;
+begin
+  Result := AnsiIndexStr(AText, AValues);
+end;
+
+function TStr.LeftFit(Text: string; Count: Smallint; Ch: Char): string;
+begin
+  if (Count > 0) and (Length(Text) > Count) then
+     Result := Copy(Text, 1, Count)
+  else
+     Result := StringOfChar(Ch, Count - length(Text)) + Text;
+end;
+
+function TStr.LeftFit(Value: Currency; Count: Smallint; Ch: Char;
+  Masc: string): string;
+begin
+  Result := LeftFit(FormatFloat(Masc, Value), Count, Ch);
+end;
+
+function TStr.padL(const AString: AnsiString; const Len: Integer;
+  const Caracter: AnsiChar): AnsiString;
+begin
+
+end;
+
+function TStr.RemovePoint(Str: string): string;
+begin
+
+end;
+
+function TStr.RepeatChar(Len: Integer; Char: char): string;
+begin
+
+end;
+
+function TStr.Replace(const Str, OldPattern, NewPattern: string): string;
+begin
+  Result := StringReplace(Str, OldPattern, NewPattern, [rfReplaceAll,
+    rfIgnoreCase]);
+end;
+
+function TStr.Right(const Str: string; const Count: Integer): string;
+begin
+  Result := StrUtils.RightStr(Str, Count);
+end;
+
+function TStr.RightFit(Text: string; Count: Smallint; Ch: Char): string;
+begin
+  if (Count > 0) and (Length(Text) > Count) then
+     Result := Copy(Text, 1, Count)
+  else
+     Result := Text + StringOfChar(Ch, Count - Length(Text));
+end;
+
+function TStr.RightFit(Value: Currency; Count: Smallint; Ch: Char;
+  Masc: string): string;
+begin
+  Result := RightFit(FormatFloat(Masc, Value), Count, Ch);
+end;
+
+function TStr.Trans(Str, Char, CharS: string): string;
+begin
+
+end;
+
+{ TDate }
+
+procedure TDate.DecodeDate(var Year, Month, Day: Word);
+begin
+  SysUtils.DecodeDate(Now, Year, Month, Day);
+end;
+
+function TDate.EncodeDate(Year, Month, Day: Word): TDateTime;
+begin
+  Result := SysUtils.EncodeDate(Year, Month, Day);
+end;
+
+function TDate.EndOfAMonth(const AYear, AMonth: Word): TDateTime;
+begin
+  Result := DateUtils.EndOfAMonth(AYear, AMonth);
 end;
 
 initialization
